@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { DatabaseModule } from './database/db.module.js';
+import { AuthGuard } from './common/guards/auth.guard.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { TenantsModule } from './modules/tenants/tenants.module.js';
 import { StoreConfigModule } from './modules/store-config/store-config.module.js';
@@ -28,6 +30,9 @@ import { AnalyticsModule } from './modules/analytics/analytics.module.js';
     AnalyticsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    { provide: APP_GUARD, useClass: AuthGuard },
+    AppService,
+  ],
 })
 export class AppModule {}

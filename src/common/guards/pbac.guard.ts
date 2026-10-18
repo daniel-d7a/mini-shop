@@ -1,18 +1,18 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { AuthedRequest } from '../request-auth.js';
 
 @Injectable()
 export class PbacGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest<Request>();
-    const session = (request as { user?: unknown }).user;
-    if (!session) {
-      throw new UnauthorizedException('No active session');
+    const request = context.switchToHttp().getRequest<AuthedRequest>();
+    const tenantId = request.auth?.user.tenantId;
+    if (!tenantId) {
+      throw new ForbiddenException('Tenant context is missing');
     }
     return true;
   }
